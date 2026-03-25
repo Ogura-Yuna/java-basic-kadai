@@ -5,13 +5,19 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Kadai {
 	
 	static String url = "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1";
 	static String user = "sa";
 	static String password = "";
+	
+	static List<User> users;
 	
 	static Scanner scanner;
 
@@ -29,6 +35,7 @@ public class Kadai {
 			System.out.println("2: 登録");
 			System.out.println("3: 更新");
 			System.out.println("4: 削除");
+			System.out.println("5: サブメニュー");
 			System.out.println("0: 終了");
 			System.out.println("操作を選択してください > ");
 				
@@ -36,25 +43,136 @@ public class Kadai {
 			int input = scanner.nextInt();
 			
 			switch(input) {
-			case 0: 
-				//Scannerクラスのオブジェクトをクローズする
-				scanner.close();
-				loopFlg = false;
-				break;
-			case 1:
-				userSelect();
-				break;
-			case 2:
-				userInsert();
-				break;
-			case 3:
-				userUpdate();
-				break;
-			case 4:
-				userDelete();
-				break;
+				case 0: 
+					//Scannerクラスのオブジェクトをクローズする
+					scanner.close();
+					loopFlg = false;
+					break;
+					
+				case 1:
+					userSelect();
+					break;
+				
+				case 2:
+					userInsert();
+					break;
+				
+				case 3:
+					userUpdate();
+					break;
+				
+				case 4:
+					userDelete();
+					break;
+				
+				case 5:
+					userList();
+					break;
 			}
 			
+		}
+	}
+	
+	public static void userList() {
+		
+		boolean loopFlg = true;
+		
+		// 会員情報取得
+		userSelect();
+		
+		if(users != null && !users.isEmpty()) {	
+			while(loopFlg) {
+			
+				System.out.println("--- 追加課題メニュー ---");
+				System.out.println("1: 20歳以上の会員を表示");
+				System.out.println("2: 会員名一覧を表示");
+				System.out.println("3: 平均年齢を表示");
+				System.out.println("4: 最年長の会員を表示");
+				System.out.println("5: 名前順に並べて表示");
+				System.out.println("6: 18歳未満の会員がいるか判定");
+				System.out.println("7: 会員名をカンマ区切りで表示");
+				System.out.println("8: 年齢ごとにグループ分けして表示");
+				System.out.println("9: 名前ごとの件数を表示");
+				System.out.println("10: 最年少の会員を表示");
+				System.out.println("0: メインメニューに戻る");
+				System.out.println("操作を選択してください > ");
+				
+				//入力した内容を取得する
+				int input = scanner.nextInt();
+				
+				switch(input) {
+					case 0: 
+						// メインメニューに戻る
+						loopFlg = false;
+						break;
+					
+					case 1:
+						// 20歳以上の会員を表示
+						System.out.println("--- 20歳以上の会員 ---");
+						users.stream().filter(user -> user.getAge() >= 20)
+							.forEach(user -> System.out.println(user.id + " / " + user.name + " / " + user.age));
+						break;
+					
+					case 2:
+						// 会員名一覧を表示
+						System.out.println("--- 会員名一覧 ---");
+						users.stream().map(User::getName).forEach(System.out::println);
+						break;
+					
+					case 3:
+						// 平均年齢を表示
+						System.out.println("平均年齢: " + users.stream().mapToInt(User::getAge).average().orElse(0.0));
+						break;
+					
+					case 4:
+						// 最年長の会員を表示
+						System.out.println("--- 最年長の会員 ---");
+						users.stream().max(Comparator.comparingInt(User::getAge))
+							.ifPresent(user -> System.out.println(user.id + " / " + user.name + " / " + user.age));
+						break;
+					
+					case 5:
+						// 名前順に並べて表示
+						System.out.println("--- 名前順一覧 ---");
+						users.stream().sorted(Comparator.comparing(User::getName))
+							.forEach(user -> System.out.println(user.id + " / " + user.name + " / " + user.age));
+						break;
+					
+					case 6:
+						// 18歳未満の会員がいるか判定
+						boolean minorFlg = users.stream().anyMatch(user -> user.getAge() < 18);
+						if(minorFlg) {
+							System.out.println("18歳未満の会員がいます。");
+						} else {
+							System.out.println("18歳未満の会員はいません。");
+						}
+						break;
+					
+					case 7:
+						// 会員名をカンマ区切りで表示
+						System.out.println(users.stream().map(User::getName).collect(Collectors.joining(", ")));
+						break;
+					
+					case 8:
+						// 年齢ごとにグループ分けして表示
+						users.stream().collect(Collectors.groupingBy(User::getAge, Collectors.mapping(User::getName, Collectors.toList())))
+							.forEach((age, names) -> System.out.println(age + "歳: " + names));
+						break;
+					
+					case 9:
+						// 名前ごとの件数を表示
+						users.stream().collect(Collectors.groupingBy(User::getName, Collectors.counting()))
+							.forEach((name, cnt) -> System.out.println(name + ": " + cnt + "件"));
+						break;
+					
+					case 10:
+						// 最年少の会員を表示
+						System.out.println("--- 最年少の会員 ---");
+						users.stream().min(Comparator.comparingInt(User::getAge))
+							.ifPresent(user -> System.out.println(user.id + " / " + user.name + " / " + user.age));
+						break;
+				}
+			}
 		}
 	}
 	
@@ -91,8 +209,14 @@ public class Kadai {
 						    } else {
 						        // データが存在する場合の処理
 						    	System.out.println("--- 会員一覧 ---");
+						    	users = new ArrayList<User>();
 						        do {
-						        	System.out.println(rs.getInt("id") + " / " + rs.getString("name") + " / " + rs.getString("age"));
+						        	User user = new User();
+						        	user.setId(rs.getInt("id"));
+						            user.setName(rs.getString("name"));
+						            user.setAge(rs.getInt("age"));
+						            users.add(user);
+						            System.out.println(rs.getInt("id") + " / " + rs.getString("name") + " / " + rs.getString("age"));
 						        } while (rs.next());
 						    }
 						}
