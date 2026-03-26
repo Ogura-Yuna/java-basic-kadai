@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>今日の運勢占いページ</title>
+	</head>
+	<body>
+		<h1>今日の運勢占い</h1>
+		<p>ボタンを押すと、今日のあなたの運勢を表示します。</p>
+		<form action="/result" method="get">
+			<button>占う</button>
+		</form>
+		
+		<div th:if="${result} != null">
+			<p>今日は<span th:text="${#dates.format(#dates.createNow(), 'yyyy年MM月dd日')}"></span></p>
+			<p>今日の運勢は「<span th:text="${result}"></span>」</p>
+			<p><span th:text="${detail}"></span></p>
+		</div>
+		
+		<p><a href="/">TOPページに戻る</a></p>
+	</body>
+</html>

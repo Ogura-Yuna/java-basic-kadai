@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>星座占いページ</title>
+	</head>
+	<body>
+		<h1>星座占い</h1>
+		<p>自分の星座を選ぶと、今日の運勢を表示します。</p>
+		<form action="/stellaUranai" method="get">
+			<select name="stella">
+				<option 
+					th:each="stella : ${stellaList}" 
+					th:value="${stella}" 
+					th:text="${stella}" 
+					th:selected="${stella == selectStella}"
+				>
+				</option>
+			</select>
+			<button>占う</button>
+		</form>
+		<div th:if="${selectStella != null}">
+			<p><span th:text="${selectStella}"></span>の運勢は...</p>
+			<p>「<span th:text="${result}"></span>」</p>
+			<p><span th:text="${detail}"></span></p>
+		</div>
+    
+		<p><a href="/">TOPページに戻る</a></p>
+	</body>
+</html>
