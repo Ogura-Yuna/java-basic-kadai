@@ -17,8 +17,6 @@ public class Kadai {
 	static String user = "sa";
 	static String password = "";
 	
-	static List<User> users;
-	
 	static Scanner scanner;
 
 	public static void main(String[] args) {
@@ -38,9 +36,15 @@ public class Kadai {
 			System.out.println("5: サブメニュー");
 			System.out.println("0: 終了");
 			System.out.println("操作を選択してください > ");
-				
-			//入力した内容を取得する
-			int input = scanner.nextInt();
+			
+			int input = 0;
+			if(scanner.hasNextInt()) {
+				//入力した内容を取得する
+				input = scanner.nextInt();
+			} else {
+				System.out.println("操作番号は数値で入力してください。");
+				continue;
+			}
 			
 			switch(input) {
 				case 0: 
@@ -78,7 +82,7 @@ public class Kadai {
 		boolean loopFlg = true;
 		
 		// 会員情報取得
-		userSelect();
+		List<User> users = userSelect();
 		
 		if(users != null && !users.isEmpty()) {	
 			while(loopFlg) {
@@ -97,8 +101,14 @@ public class Kadai {
 				System.out.println("0: メインメニューに戻る");
 				System.out.println("操作を選択してください > ");
 				
-				//入力した内容を取得する
-				int input = scanner.nextInt();
+				int input = 0;
+				if(scanner.hasNextInt()) {
+					//入力した内容を取得する
+					input = scanner.nextInt();
+				} else {
+					System.out.println("操作番号は数値で入力してください。");
+					continue;
+				}
 				
 				switch(input) {
 					case 0: 
@@ -110,7 +120,7 @@ public class Kadai {
 						// 20歳以上の会員を表示
 						System.out.println("--- 20歳以上の会員 ---");
 						users.stream().filter(user -> user.getAge() >= 20)
-							.forEach(user -> System.out.println(user.id + " / " + user.name + " / " + user.age));
+							.forEach(user -> System.out.println(user.getId() + " / " + user.getName() + " / " + user.getAge()));
 						break;
 					
 					case 2:
@@ -128,14 +138,14 @@ public class Kadai {
 						// 最年長の会員を表示
 						System.out.println("--- 最年長の会員 ---");
 						users.stream().max(Comparator.comparingInt(User::getAge))
-							.ifPresent(user -> System.out.println(user.id + " / " + user.name + " / " + user.age));
+							.ifPresent(user -> System.out.println(user.getId() + " / " + user.getName() + " / " + user.getAge()));
 						break;
 					
 					case 5:
 						// 名前順に並べて表示
 						System.out.println("--- 名前順一覧 ---");
 						users.stream().sorted(Comparator.comparing(User::getName))
-							.forEach(user -> System.out.println(user.id + " / " + user.name + " / " + user.age));
+							.forEach(user -> System.out.println(user.getId() + " / " + user.getName() + " / " + user.getAge()));
 						break;
 					
 					case 6:
@@ -169,7 +179,7 @@ public class Kadai {
 						// 最年少の会員を表示
 						System.out.println("--- 最年少の会員 ---");
 						users.stream().min(Comparator.comparingInt(User::getAge))
-							.ifPresent(user -> System.out.println(user.id + " / " + user.name + " / " + user.age));
+							.ifPresent(user -> System.out.println(user.getId() + " / " + user.getName() + " / " + user.getAge()));
 						break;
 				}
 			}
@@ -194,7 +204,9 @@ public class Kadai {
 			}
 	}
 		
-	public static void userSelect() {
+	public static List<User> userSelect() {
+		
+		List<User> users = new ArrayList<User>();
 		
 		try (
 				Connection conn = DriverManager.getConnection(url, user, password);
@@ -224,20 +236,43 @@ public class Kadai {
 				e.printStackTrace();
 			
 			}
+		
+		return users;
 			
 		
 	}
 	
 	public static void userInsert() {
 		
-		System.out.println("登録するIDを入力してください:");
-		int insertId = scanner.nextInt();
+		int insertId = 0;
+		boolean numFlg = false;
+		while(!numFlg) {
+			System.out.println("登録するIDを入力してください:");
+			if(scanner.hasNextInt()) {
+				numFlg = true;
+				insertId = scanner.nextInt();
+			} else {
+				System.out.println("IDは数値を入力してください");
+			}
+		}
+
+		// 数値の後の改行を消費
+		scanner.nextLine();
 		
 		System.out.println("名前を入力してください:");
-		String insertName = scanner.next();
+		String insertName = scanner.nextLine();
 		
-		System.out.println("年齢を入力してください:");
-		int insertAge = scanner.nextInt();
+		int insertAge = 0;
+		numFlg = false;
+		while(!numFlg) {
+			System.out.println("年齢を入力してください:");
+			if(scanner.hasNextInt()) {
+				numFlg = true;
+				insertAge = scanner.nextInt();
+			} else {
+				System.out.println("年齢は数値を入力してください");
+			}
+		}
 		
 		try (
 				Connection conn = DriverManager.getConnection(url, user, password);
@@ -260,41 +295,52 @@ public class Kadai {
 	
 	public static void userUpdate() {
 		
-		System.out.println("更新するIDを入力してください:");
-		int updateId = scanner.nextInt();
+		int updateId = 0;
+		boolean numFlg = false;
+		while(!numFlg) {
+			System.out.println("更新するIDを入力してください:");
+			if(scanner.hasNextInt()) {
+				numFlg = true;
+				updateId = scanner.nextInt();
+			} else {
+				System.out.println("IDは数値を入力してください:");
+			}
+		}
 		
+		// 数値の後の改行を消費
+		scanner.nextLine();
+				
 		System.out.println("新しい名前を入力してください:");
-		String updateName = scanner.next();
+		String updateName = scanner.nextLine();
 		
-		System.out.println("新しい年齢を入力してください:");
-		int updateAge = scanner.nextInt();
+		int updateAge = 0;
+		numFlg = false;
+		while(!numFlg) {
+			System.out.println("新しい年齢を入力してください:");
+			if(scanner.hasNextInt()) {
+				numFlg = true;
+				updateAge = scanner.nextInt();
+			} else {
+				System.out.println("年齢は数値を入力してください:");
+			}
+		}
 		
 		try (
 				Connection conn = DriverManager.getConnection(url, user, password);
 				Statement stmt = conn.createStatement()
 			) {
-				try (PreparedStatement selectPs = 
-					conn.prepareStatement("SELECT id, name, age FROM users WHERE id = ? ORDER BY id")) {
-						selectPs.setInt(1, updateId);
-						try (ResultSet rs = selectPs.executeQuery()) {
-							if (!rs.next()) {
-						        // データが0件の場合の処理
-								System.out.println("指定したIDの会員は存在しません。");
-						    } else {
-						        // データが存在する場合の処理
-						        do {
-						        	try (PreparedStatement updatePs = 
-											conn.prepareStatement("UPDATE users SET name= ?, age= ? WHERE id= ?")) {
-								        		updatePs.setString(1, updateName);
-								        		updatePs.setInt(2, updateAge);
-								        		updatePs.setInt(3, updateId);
-								        		updatePs.executeUpdate();
-												System.out.println("更新しました。");
-											}
-						        } while (rs.next());
-						    }
+				try (PreparedStatement updatePs = 
+						conn.prepareStatement("UPDATE users SET name= ?, age= ? WHERE id= ?")) {
+			        		updatePs.setString(1, updateName);
+			        		updatePs.setInt(2, updateAge);
+			        		updatePs.setInt(3, updateId);
+			        		int rs = updatePs.executeUpdate();
+			        		if(rs > 0) {
+			        			System.out.println("更新しました。");
+			        		} else {
+			        			System.out.println("指定したIDの会員は存在しません。");
+			        		}
 						}
-					}
 			} catch (Exception e) {
 				e.printStackTrace();
 			
@@ -304,33 +350,32 @@ public class Kadai {
 	
 	public static void userDelete() {
 		
-		System.out.println("削除するIDを入力してください:");
-		int deleteId = scanner.nextInt();
+		int deleteId = 0;
+		boolean numFlg = false;
+		while(!numFlg) {
+			System.out.println("削除するIDを入力してください:");
+			if(scanner.hasNextInt()) {
+				numFlg = true;
+				deleteId = scanner.nextInt();
+			} else {
+				System.out.println("IDは数値を入力してください:");
+			}
+		}
 		
 		try (
 				Connection conn = DriverManager.getConnection(url, user, password);
 				Statement stmt = conn.createStatement()
 			) {
-				try (PreparedStatement selectPs = 
-					conn.prepareStatement("SELECT id, name, age FROM users WHERE id = ? ORDER BY id")) {
-						selectPs.setInt(1, deleteId);
-						try (ResultSet rs = selectPs.executeQuery()) {
-							if (!rs.next()) {
-						        // データが0件の場合の処理
-								System.out.println("指定したIDの会員は存在しません。");
-						    } else {
-						        // データが存在する場合の処理
-						        do {
-						        	try (PreparedStatement deletePs = 
-											conn.prepareStatement("DELETE FROM users WHERE id= ?")) {
-								        		deletePs.setInt(1, deleteId);
-								        		deletePs.executeUpdate();
-												System.out.println("削除しました。");
-											}
-						        } while (rs.next());
-						    }
+				try (PreparedStatement deletePs = 
+						conn.prepareStatement("DELETE FROM users WHERE id= ?")) {
+			        		deletePs.setInt(1, deleteId);
+			        		int rs = deletePs.executeUpdate();
+			        		if(rs > 0) {
+			        			System.out.println("削除しました。");
+			        		} else {
+			        			System.out.println("指定したIDの会員は存在しません。");
+			        		}
 						}
-					}
 			} catch (Exception e) {
 				e.printStackTrace();
 			

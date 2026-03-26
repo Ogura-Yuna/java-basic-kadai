@@ -2,9 +2,9 @@ package kadai_01;
 
 public class User {
 	
-	public int id;
-	public String name;
-	public int age;
+	private int id;
+	private String name;
+	private int age;
 	
 	public int getId() {
         return this.id;
