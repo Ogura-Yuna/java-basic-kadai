@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>フォームクラスについて学ぼう課題</title>
+</head>
+<body>
+	<h1>電卓</h1>
+	<form th:action="@{/calculator}" th:object="${calculatorForm}" method="post">
+		<div>
+			<label>数値1:</label>
+			<input type="text" th:field="*{num1}">
+		</div>
+		<div>
+			<label>演算子:</label>
+			<select th:field="*{operator}">
+				<option value="+">+</option>
+				<option value="-">-</option>
+				<option value="*">*</option>
+				<option value="/">/</option>
+			</select>
+		</div>
+		<div>
+			<label>数値2:</label>
+			<input type="text" th:field="*{num2}">
+		</div>
+		<button type="submit">=</button>
+	</form>
+	<div>
+		<label>計算結果:</label>
+		<output th:text="${result}"></output>
+	</div>
+	<div th:if="${errorMsg}" style="color: red;" th:text="${errorMsg}"></div>
+</body>
+</html>
