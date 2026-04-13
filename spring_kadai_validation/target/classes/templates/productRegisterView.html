@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>バリデーションについて学ぼう課題</title>
+</head>
+
+<body>
+	<h1>商品登録フォーム</h1>
+	<form th:action="@{/register}" method="post" th:object="${productRegisterForm}">
+		<div>
+			<label for="productName">商品名：</label>
+			<input type="text" th:field="*{productName}">
+			<div th:if="${#fields.hasErrors('productName')}" th:errors="*{productName}" style="color: red;"></div>
+		</div>
+
+		<div>
+			<label for="price">価格　：</label>
+			<input type="number" th:field="*{price}">
+			<div th:if="${#fields.hasErrors('price')}" th:errors="*{price}" style="color: red;"></div>
+		</div>
+
+		<div>
+			<label for="stock">在庫数：</label>
+			<input type="number" th:field="*{stock}">
+			<div th:if="${#fields.hasErrors('stock')}" th:errors="*{stock}" style="color: red;"></div>
+		</div>
+		
+		<button type="submit">登録</button>
+
+		<div th:if="${message}" style="color: green;">
+			<span th:text="${message}"></span>
+		</div>
+	</form>
+</body>
+
+</html>
